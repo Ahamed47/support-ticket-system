@@ -1,0 +1,97 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Details</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-image: url("{% static 'images/background.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            /* Use min-height to make sure content can expand */
+            background-attachment: fixed;
+            overflow: auto;
+            /* Prevent scrolling */
+        }
+
+        .container {
+            z-index: 10;
+            /* Ensures content appears on top of the background */
+        }
+
+        .heading-text {
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid mt-5 position-relative">
+        <div class="position-fixed top-0 right-0 m-3">
+            <a href="{% url 'ticket-list' %}" class="btn btn-secondary">Back to Ticket List</a>
+        </div>
+        <h2 class="my-4 text-center heading-text">Ticket Details</h2>
+
+        <!-- Row for ticket details and add notes form -->
+        <div class="row">
+            <!-- Ticket Details Column -->
+            <div class="col-md-8 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title"><strong>Ticket Number:</strong> {{ ticket.ticket_number }}</h3>
+                        <h4><strong>Title:</strong> {{ ticket.title }}</h4>
+                        <p><strong>Description:</strong> {{ ticket.description }}</p>
+                        <p><strong>Created on:</strong> {{ ticket.created_at }}</p>
+                        <p><strong>Last Updated</strong> {{ticket.last_updated_at}}</p>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3>Notes</h3>
+                        {% if notes %}
+                        <ul class="list-group">
+                            {% for note in notes %}
+                            <li class="list-group-item">
+                                <p><strong>Note:</strong> {{ note.content }}</p>
+                                <p><small><strong>Added by:</strong> {{ note.user.username }} |
+                                        <strong>Created on:</strong> {{ note.created_at }}</small></p>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p>No notes yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add a New Note Column -->
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h3>Add a New Note</h3>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                {{ note_form.as_p }}
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Note</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

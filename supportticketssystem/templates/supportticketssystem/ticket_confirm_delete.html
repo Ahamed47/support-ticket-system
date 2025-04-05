@@ -1,0 +1,52 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Deletion</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url("{% static 'images/background.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            /* Use min-height to make sure content can expand */
+            background-attachment: fixed;
+            overflow: auto;
+            /* Prevent scrolling */
+        }
+
+        .container {
+            z-index: 10;
+            /* Ensures content appears on top of the background */
+        }
+    </style>
+
+</head>
+
+<body class="bg-light">
+
+    <div class="container mt-5">
+        <div class="card shadow p-4 mx-auto" style="max-width: 500px;">
+            <h2 class="text-center mb-4">Are you sure you want to delete this ticket?</h2>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <button type="submit" class="btn btn-danger w-100 mb-3">Yes, delete ticket</button>
+
+                <a href="{% url 'ticket-list' %}" class="btn btn-secondary w-100">Cancel</a>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
