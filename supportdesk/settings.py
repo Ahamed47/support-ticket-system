@@ -131,6 +131,15 @@ LOGIN_URL = 'login'
 LOGOUT_REDIRECT_URL = 'login'
 
 
+SECURE_SSL_REDIRECT = True  # Forces redirect from HTTP to HTTPS
+SECURE_HSTS_SECONDS = 3600  # HTTP Strict Transport Security
+SECURE_HSTS_PRELOAD = True  # Allow preloading of HSTS
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply to subdomains
+
+SECURE_CONTENT_TYPE_NOSNIFF = True 
+
+
+
 # # settings.py
 # STATIC_URL = '/static/'
 
