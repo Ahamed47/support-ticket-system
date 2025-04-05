@@ -4,27 +4,27 @@ env:
   DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_SESSION_TOKEN: ${{secrets.AWS_SESSION_TOKEN}}
-  AWS_STORAGE_BUCKET_NAME: ${{ secrets.AWS_STORAGE_BUCKET_NAME }}
-  EB_S3_BUCKET_NAME: "elasticbeanstalk-eu-west-1-050752637269"
-  EB_APPLICATION_NAME: "support-desk-devopssec"
-  EB_ENVIRONMENT_NAME: "support-desk-devopssec-env"
-  DEPLOY_PACKAGE_NAME: "support-desk-devopssec-${{ github.sha }}.zip"
+  EB_S3_BUCKET_NAME: "elasticbeanstalk-eu-west-1-050752637269" # Make sure this bucket is correct
+  EB_APPLICATION_NAME: "support-desk-devopssec" # Your EB application name
+  EB_ENVIRONMENT_NAME: "support-desk-devopssec-env" # Your EB environment name
+  DEPLOY_PACKAGE_NAME: "support-desk-devopssec-${{ github.sha }}.zip" # Package name with sha
   VERSION_NAME: ${{ github.sha }}
-  AWS_REGION_NAME: "eu-west-1"
+  AWS_REGION_NAME: "eu-west-1" # Your AWS region
 
 on:
   push:
     branches:
-      - main
+      - main # Trigger on push to the main branch
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # Step 1: Checkout the code
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Step 2: Set up Python and install dependencies
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -35,16 +35,20 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # Step 3: Run Django migrations
       - name: Run Migrations
         run: |
           python manage.py migrate
 
+      # Step 4: Collect static files for production
       - name: Collect static files
         run: python manage.py collectstatic --noinput
 
+      # Step 5: Create deployment package (zip)
       - name: Create zip deployment package
         run: zip -r ${{ env.DEPLOY_PACKAGE_NAME }} ./ -x "*.git*" "*.github*" "*.vscode*"
 
+      # Step 6: Configure AWS credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -52,6 +56,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION_NAME }}
 
+      # Step 7: Upload zip file to S3
       - name: Copying file to S3
         run: aws s3 cp ${{ env.DEPLOY_PACKAGE_NAME }} s3://${{ env.EB_S3_BUCKET_NAME }}/
 
@@ -59,6 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      # Step 1: Configure AWS credentials again for the deploy job
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -66,6 +72,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION_NAME }}
 
+      # Step 2: Create a new EB application version
       - name: Create new EB application version
         run: |
           aws elasticbeanstalk create-application-version \
@@ -73,6 +80,7 @@ jobs:
           --source-bundle S3Bucket="${{ env.EB_S3_BUCKET_NAME }}",S3Key="${{ env.DEPLOY_PACKAGE_NAME }}" \
           --version-label "${{ env.VERSION_NAME }}"
 
+      # Step 3: Deploy the application version to Elastic Beanstalk environment
       - name: Deploy new application version to environment
         run: |
           aws elasticbeanstalk update-environment \
