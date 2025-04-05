@@ -21,7 +21,7 @@ from .forms import UserRegisterForm, UserLoginForm, TicketForm, NoteForm
 
 
 
-# Home Page
+## Home Page
 def home(request):
     """
     View for the home page of the support ticket system.
