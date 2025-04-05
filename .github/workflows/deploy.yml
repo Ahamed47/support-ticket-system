@@ -28,7 +28,7 @@ jobs:
 
       # Step 4: Configure AWS credentials from GitHub secrets
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -37,6 +37,7 @@ jobs:
       # Step 5: Deploy the application to Elastic Beanstalk
       - name: Deploy to Elastic Beanstalk
         run: |
+          eb init -p python-3.11 ${EB_APP_NAME} --region ${{ secrets.AWS_REGION }}  # Initialize Elastic Beanstalk (if not initialized)
           eb use ${{ secrets.ENV_NAME }}  # Use the correct environment for deployment
           eb deploy  # Deploy the latest changes to Elastic Beanstalk
 
