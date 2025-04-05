@@ -41,8 +41,8 @@ jobs:
           python manage.py migrate
 
       # Step 4: Collect static files for production
-      - name: Collect static files
-        run: python manage.py collectstatic --noinput
+      # - name: Collect static files
+      #   run: python manage.py collectstatic --noinput
 
       # Step 5: Create deployment package (zip)
       - name: Create zip deployment package
