@@ -3,54 +3,33 @@ name: Deploy to Elastic Beanstalk
 on:
   push:
     branches:
-      - main # Trigger deployment when code is pushed to the master branch
+      - master
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest # Use the latest Ubuntu runner for GitHub Actions
+    runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout code from the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up Python environment (required for your Django app)
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11" # You can change this to the version you're using in your project
+          python-version: "3.11"
 
-      # Step 3: Install dependencies using pip and the AWS Elastic Beanstalk CLI (EB CLI)
-      - name: Install EB CLI and dependencies
+      - name: Install EB CLI
         run: |
-          pip install -r requirements.txt  # Ensure any dependencies for your Django app are installed
-          pip install awsebcli  # Install the AWS Elastic Beanstalk CLI
+          pip install awsebcli
 
-      # Step 4: Configure AWS credentials from GitHub secrets
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }} # Specify the region where your Elastic Beanstalk environment is located
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-        # Step 5: Initialize Elastic Beanstalk (if not already initialized)
-      - name: Initialize Elastic Beanstalk (if not already initialized)
-        run: |
-          eb init -p python-3.11 ${EB_APP_NAME} --region ${{ secrets.AWS_REGION }}  # Initialize the Elastic Beanstalk app
-
-      # Step 6: Explicitly create a new application version before deploying
-      - name: Create application version
-        run: |
-          VERSION_LABEL=$(date +%Y%m%d%H%M%S)  # Use a timestamp to create a unique version name
-          zip -r $VERSION_LABEL.zip .  # Package the app into a zip file for deployment
-          aws s3 cp $VERSION_LABEL.zip s3://elasticbeanstalk-${{ secrets.AWS_REGION }}-$(aws sts get-caller-identity --query Arn --output text | cut -d'/' -f2)/$VERSION_LABEL.zip
-          eb create --application-name ${EB_APP_NAME} --version-label $VERSION_LABEL --region ${{ secrets.AWS_REGION }}
-
-      # Step 5: Deploy the application to Elastic Beanstalk
       - name: Deploy to Elastic Beanstalk
         run: |
-          eb use ${{ secrets.ENV_NAME }}  # Use the correct environment for deployment
-          eb deploy  # Deploy the latest changes to Elastic Beanstalk
-
-      # Optional Step: Post-deployment, you can add steps to notify or test the deployment
+          eb use ${{ secrets.ENV_NAME }}
+          eb deploy
