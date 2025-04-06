@@ -59,7 +59,6 @@ class NoteForm(forms.ModelForm):
         and specifies the 'content' field to be included in the form.
         """
         model = Note
-        # fields = ["text"]
         fields = ['content']  # Ensure this matches your model definitio
 
 class UserRegisterForm(UserCreationForm):
