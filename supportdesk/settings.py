@@ -130,13 +130,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = 'login'
 LOGOUT_REDIRECT_URL = 'login'
-
-
-# # settings.py
-# STATIC_URL = '/static/'
-
-# # For development (during development only, don't use this in production)
-# STATICFILES_DIRS = [BASE_DIR / "static"]
-
-# # For production, make sure to also set this correctly:
-# STATIC_ROOT = BASE_DIR / "staticfiles"
