@@ -4,12 +4,12 @@ env:
   DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  EB_S3_BUCKET_NAME: "elasticbeanstalk-eu-west-1-050752637269" # Make sure this bucket is correct
-  EB_APPLICATION_NAME: "support-ticket" # Your EB application name
-  EB_ENVIRONMENT_NAME: "support-ticket-env" # Your EB environment name
-  DEPLOY_PACKAGE_NAME: "support-ticket-${{ github.sha }}.zip" # Package name with sha
+  EB_S3_BUCKET_NAME: "elasticbeanstalk-eu-west-1-050752637269"
+  EB_APPLICATION_NAME: "support-ticket"
+  EB_ENVIRONMENT_NAME: "support-ticket-env"
+  DEPLOY_PACKAGE_NAME: "support-ticket-${{ github.sha }}.zip"
   VERSION_NAME: ${{ github.sha }}
-  AWS_REGION_NAME: "eu-west-1" # Your AWS region
+  AWS_REGION_NAME: "eu-west-1"
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step 2: Set up Python and install dependencies
+      # Step 2: Python and install dependencies
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -39,20 +39,16 @@ jobs:
         run: |
           pylint supportdesk/**/*.py --disable=C0114,C0115,C0116
 
-      # Step 3: Run Django migrations
+      # Step 3: Django migrations
       - name: Run Migrations
         run: |
           python manage.py migrate
 
-      # Step 4: Collect static files for production
-      # - name: Collect static files
-      #   run: python manage.py collectstatic --noinput
-
-      # Step 5: Create deployment package (zip)
+      # Step 4: Create deployment package (zip)
       - name: Create zip deployment package
         run: zip -r ${{ env.DEPLOY_PACKAGE_NAME }} ./ -x "*.git*" "*.github*" "*.vscode*"
 
-      # Step 6: Configure AWS credentials
+      # Step 5: Configure AWS credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
